@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class TravelLocationViewController: UIViewController,MKMapViewDelegate {
+class TravelLocationViewController: UIViewController,MKMapViewDelegate,PhotoAlbumViewControllerDelegate {
     
     let Map_Position = "mapPosition"
     
@@ -37,6 +37,17 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate {
         if sender.state == UIGestureRecognizerState.Began {
             let touchPosition = sender.locationInView(mapView)
             let mapCoordinate = mapView.convertPoint(touchPosition, toCoordinateFromView: mapView)
+            //save to coreData
+            let pinEntity =
+            NSEntityDescription.entityForName("Pin", inManagedObjectContext: sharedContext)
+            let pin =
+            Pin(entity: pinEntity!, insertIntoManagedObjectContext: sharedContext)
+            pin.latitude = "\(mapCoordinate.latitude)"
+            pin.longitude = "\(mapCoordinate.longitude)"
+            pin.date = NSDate()
+            //        pin.photos = [Photo]()
+            
+            CoreDataStack.sharedInstance().saveContext()
             addAnnotation(mapCoordinate)
         }
         
@@ -76,15 +87,6 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate {
         let entityDescription = NSEntityDescription.entityForName("Pin", inManagedObjectContext: sharedContext)
         fetchRequest.entity = entityDescription
         
-//        let fetchedObjects:[AnyObject]?
-//        fetchedObjects = try? sharedContext.executeFetchRequest(fetchRequest)
-//        
-//        print(fetchedObjects)
-//        
-//        let pins = fetchedObjects as? [Pin]
-//        
-//        print(pins?.count)
-        
         let pins: [Pin]
         do {
             let results = try sharedContext.executeFetchRequest(fetchRequest)
@@ -94,17 +96,28 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate {
             pins = [Pin]()
         }
         
+        let currentAnnotions = mapView.annotations
+        mapView.removeAnnotations(currentAnnotions)
+        for pin in pins {
+            let lat = (pin.latitude as NSString).doubleValue
+            let lon = (pin.longitude as NSString).doubleValue
+            addAnnotation(CLLocationCoordinate2D(latitude: lat, longitude: lon))
+        }
         
-//        if let fetchedObjects = pins {
-            let currentAnnotions = mapView.annotations
-            mapView.removeAnnotations(currentAnnotions)
-            for pin in pins {
-                let lat = (pin.latitude as NSString).doubleValue
-                let lon = (pin.longitude as NSString).doubleValue
-                addAnnotation(CLLocationCoordinate2D(latitude: lat, longitude: lon))
+    }
+    
+    //MARK: - Download Methods
+    
+    func downloadImages(coordinates : CLLocationCoordinate2D, page: String?) {
+        let client = FlickrHelper.sharedInstance
+        client.getImagesWith(coordinates.latitude, longitude: coordinates.longitude, page: page){ (data, error) in
+            if let errorMessage = error {
+                print("Error: \(errorMessage)")
+            } else {
+                print(data?.description)
+//                self.saveImages(coordinates, data: data, error: error)
             }
-//        }
-
+        }
     }
     
     func addAnnotation(coordinates: CLLocationCoordinate2D) {
@@ -112,21 +125,6 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate {
         annotation.coordinate = coordinates
         annotation.title = "Visited"
         mapView.addAnnotation(annotation)
-        
-        //save to coreData
-        let pinEntity =
-        NSEntityDescription.entityForName("Pin", inManagedObjectContext: sharedContext)
-        let pin =
-        Pin(entity: pinEntity!, insertIntoManagedObjectContext: sharedContext)
-        pin.latitude = "\(coordinates.latitude)"
-        pin.longitude = "\(coordinates.longitude)"
-        pin.date = NSDate()
-//        pin.photos = [Photo]()
-        
-        CoreDataStack.sharedInstance().saveContext()
-
-        
-        
     }
     
     //MARK: - MKMapViewDelegate Methods
@@ -161,8 +159,14 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate {
 //            albumController.context =  coreDataStack.context
             albumController.location = (sender as? MKAnnotation)?.coordinate
 //            albumController.imageDownloadQueue = imageDownloadQueue
-//            albumController.delegate = self
+            albumController.delegate = self
         }
+    }
+    
+    //MARK: - PhotoAlbumViewControllerDelegate
+    
+    func performDownload(coordinates: CLLocationCoordinate2D, page: String?){
+        downloadImages(coordinates, page: page)
     }
 
 

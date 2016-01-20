@@ -83,21 +83,47 @@
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Lzg-0s-oHl">
                                 <rect key="frame" x="0.0" y="264" width="600" height="276"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="qlK-tC-IVt">
-                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="itemSize" width="77" height="86"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="2MH-dG-TAh">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="CollectionCell" reuseIdentifier="CollectionCell" id="2MH-dG-TAh" customClass="PhotoCollectionView" customModule="VirtualTourist" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="77" height="86"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="77" height="86"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="uzq-x2-FmQ">
+                                                    <rect key="frame" x="0.0" y="0.0" width="77" height="86"/>
+                                                </imageView>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="jCJ-oQ-xws">
+                                                    <rect key="frame" x="28" y="33" width="20" height="20"/>
+                                                </activityIndicatorView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="delete" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SRe-fw-AHV">
+                                                    <rect key="frame" x="11" y="32" width="48" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
+                                        <constraints>
+                                            <constraint firstItem="uzq-x2-FmQ" firstAttribute="leading" secondItem="2MH-dG-TAh" secondAttribute="leading" id="F84-HI-fF1"/>
+                                            <constraint firstAttribute="bottom" secondItem="uzq-x2-FmQ" secondAttribute="bottom" id="FX3-n3-4xJ"/>
+                                            <constraint firstAttribute="trailing" secondItem="uzq-x2-FmQ" secondAttribute="trailing" id="LRF-LF-paI"/>
+                                            <constraint firstItem="uzq-x2-FmQ" firstAttribute="top" secondItem="2MH-dG-TAh" secondAttribute="top" id="NHq-6e-k1m"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="activityIndicator" destination="jCJ-oQ-xws" id="mg8-bh-U4p"/>
+                                            <outlet property="deleteLabel" destination="SRe-fw-AHV" id="mj8-bC-w28"/>
+                                            <outlet property="imageView" destination="uzq-x2-FmQ" id="eY4-xT-nF5"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
@@ -108,6 +134,9 @@
                                 </constraints>
                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="20"/>
                                 <state key="normal" title="New Collection"/>
+                                <connections>
+                                    <action selector="didPressNewCollection:" destination="tzg-t7-tNQ" eventType="touchUpInside" id="HUU-rV-jQ0"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -125,7 +154,9 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="collectionView" destination="Lzg-0s-oHl" id="4mT-FO-opY"/>
                         <outlet property="mapView" destination="441-Kb-egO" id="m46-Fp-GAW"/>
+                        <outlet property="newCollectionButton" destination="qKe-kd-dNq" id="9iz-ko-u8F"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TQa-IH-CyY" userLabel="First Responder" sceneMemberID="firstResponder"/>
