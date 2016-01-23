@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		12232D671C4FE5AD005CB054 /* PhotoCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12232D661C4FE5AD005CB054 /* PhotoCollectionView.swift */; };
 		12232D6A1C4FF8EF005CB054 /* FlickrHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12232D691C4FF8EF005CB054 /* FlickrHelper.swift */; };
+		12A91E4D1C5135FD00F16791 /* ImageDownloadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A91E4C1C5135FD00F16791 /* ImageDownloadOperation.swift */; };
+		12A91E4F1C5138B100F16791 /* ImageDownloadQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A91E4E1C5138B100F16791 /* ImageDownloadQueue.swift */; };
 		12C7154C1C4D315000943240 /* PhotoAlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C7154B1C4D315000943240 /* PhotoAlbumViewController.swift */; };
 		12C7154F1C4D331300943240 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C7154E1C4D331300943240 /* Pin.swift */; };
 		12C715511C4D332000943240 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C715501C4D332000943240 /* Photo.swift */; };
@@ -43,6 +45,8 @@
 /* Begin PBXFileReference section */
 		12232D661C4FE5AD005CB054 /* PhotoCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCollectionView.swift; sourceTree = "<group>"; };
 		12232D691C4FF8EF005CB054 /* FlickrHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrHelper.swift; sourceTree = "<group>"; };
+		12A91E4C1C5135FD00F16791 /* ImageDownloadOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageDownloadOperation.swift; sourceTree = "<group>"; };
+		12A91E4E1C5138B100F16791 /* ImageDownloadQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageDownloadQueue.swift; sourceTree = "<group>"; };
 		12C7154B1C4D315000943240 /* PhotoAlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoAlbumViewController.swift; sourceTree = "<group>"; };
 		12C7154E1C4D331300943240 /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
 		12C715501C4D332000943240 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
@@ -92,6 +96,8 @@
 			isa = PBXGroup;
 			children = (
 				12232D691C4FF8EF005CB054 /* FlickrHelper.swift */,
+				12A91E4C1C5135FD00F16791 /* ImageDownloadOperation.swift */,
+				12A91E4E1C5138B100F16791 /* ImageDownloadQueue.swift */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -301,9 +307,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12A91E4F1C5138B100F16791 /* ImageDownloadQueue.swift in Sources */,
 				12C715561C4D43AE00943240 /* CoreDataStack.swift in Sources */,
 				12C715511C4D332000943240 /* Photo.swift in Sources */,
 				12C7154F1C4D331300943240 /* Pin.swift in Sources */,
+				12A91E4D1C5135FD00F16791 /* ImageDownloadOperation.swift in Sources */,
 				12232D6A1C4FF8EF005CB054 /* FlickrHelper.swift in Sources */,
 				12EEBD951C4BFAE4005AD79F /* TravelLocationViewController.swift in Sources */,
 				12EEBD931C4BFAE4005AD79F /* AppDelegate.swift in Sources */,

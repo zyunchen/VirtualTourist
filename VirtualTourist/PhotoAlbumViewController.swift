@@ -50,17 +50,22 @@ class PhotoAlbumViewController: UIViewController,NSFetchedResultsControllerDeleg
                 context.deleteObject(picture)
             }
             CoreDataStack.sharedInstance().saveContext()
-            delegate?.performDownload(location!, page: "1")
-            
-            //Get new photos
-//            if let location = location {
-//                //Get random page num from 2-4
-//                let randomUInt = (arc4random() % 3)
-//                switch randomUInt{
-//                case UInt32(0):
-////                    delegate?.perfor
-//                }
-//            }
+            if let location = location {
+                // Get Random Page Number From 2 - 4
+                let randomUInt = (arc4random() % 3)
+                newCollectionButton.enabled = false
+                switch randomUInt {
+                case UInt32(0):
+                    delegate?.performDownload(location, page: "2")
+                case UInt32(1):
+                    delegate?.performDownload(location, page: "3")
+                case UInt32(2):
+                    delegate?.performDownload(location, page: "4")
+                default:
+                    newCollectionButton.enabled = true
+                    print("Error: Default case")
+                }
+            }
             
         }
     }
@@ -106,6 +111,19 @@ class PhotoAlbumViewController: UIViewController,NSFetchedResultsControllerDeleg
         
     }
     
+    func isDownloadComplete() -> Bool{
+        let photos = fetchedResultsController.fetchedObjects as? [Photo]
+        var isCompleted = true
+        if let photos = photos {
+            for photo in photos {
+                if photo.saved == false {
+                    isCompleted = false
+                }
+            }
+        }
+        return isCompleted
+    }
+    
     //MARK: - NSFetchedResultsController Delegate Methods
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
         collectionUpdates = [ClosureType]()
@@ -117,10 +135,12 @@ class PhotoAlbumViewController: UIViewController,NSFetchedResultsControllerDeleg
                 updateBlock()
             }
             }, completion: nil)
+        newCollectionButton.enabled = isDownloadComplete()
         
     }
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        print("did change object and object is \(anObject)" )
         switch type {
         case .Insert:
             collectionUpdates.append({
@@ -128,11 +148,11 @@ class PhotoAlbumViewController: UIViewController,NSFetchedResultsControllerDeleg
             })
         case .Delete:
             collectionUpdates.append({
-                self.collectionView.deleteItemsAtIndexPaths([newIndexPath!])
+                self.collectionView.deleteItemsAtIndexPaths([indexPath!])
             })
         case .Update:
             collectionUpdates.append({
-                self.collectionView.reloadItemsAtIndexPaths([newIndexPath!])
+                self.collectionView.reloadItemsAtIndexPaths([indexPath!])
             })
         default:
             return
@@ -143,22 +163,34 @@ class PhotoAlbumViewController: UIViewController,NSFetchedResultsControllerDeleg
 }
 
 extension PhotoAlbumViewController:UICollectionViewDataSource,UICollectionViewDelegate{
+    
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CollectionCell", forIndexPath: indexPath) as! PhotoCollectionView
+        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        cell.imageView.image = photo.getImage()
+        if photo.isExisted() {
+            cell.activityIndicator.stopAnimating()
+        }else{
+            cell.activityIndicator.startAnimating()
+            newCollectionButton.enabled = false
+        }
+        cell.deleteLabel.hidden = true
         return cell
     }
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        if fetchedResultsController.fetchedObjects?.count == nil {
+            return 0
+        }
+        return fetchedResultsController.fetchedObjects!.count
+
     }
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        context.deleteObject(photo)
+        CoreDataStack.sharedInstance().saveContext()
         
     }
-    
-    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
-        
-    }
-    
     
 }

@@ -13,7 +13,7 @@ import CoreData
 class TravelLocationViewController: UIViewController,MKMapViewDelegate,PhotoAlbumViewControllerDelegate {
     
     let Map_Position = "mapPosition"
-    
+    var imageDownloadQueue: ImageDownloadQueue!
 
     var sharedContext:NSManagedObjectContext {
         return CoreDataStack.sharedInstance().managedObjectContext
@@ -26,6 +26,7 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate,PhotoAlbu
         mapView.delegate = self
         setMapPosition()
         loadPins()
+        imageDownloadQueue = ImageDownloadQueue()
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,10 +46,11 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate,PhotoAlbu
             pin.latitude = "\(mapCoordinate.latitude)"
             pin.longitude = "\(mapCoordinate.longitude)"
             pin.date = NSDate()
-            //        pin.photos = [Photo]()
             
             CoreDataStack.sharedInstance().saveContext()
+            
             addAnnotation(mapCoordinate)
+            downloadImages(mapCoordinate, page: "1")
         }
         
     }
@@ -115,10 +117,68 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate,PhotoAlbu
                 print("Error: \(errorMessage)")
             } else {
                 print(data?.description)
-//                self.saveImages(coordinates, data: data, error: error)
+                self.saveImages(coordinates, data: data, error: error)
             }
         }
     }
+    
+    func saveImages(coordinates : CLLocationCoordinate2D, data: NSArray?, error: NSString? ) {
+        guard let data = data else {
+            print("data is nil")
+            return
+        }
+        sharedContext.performBlock(){
+            let fetchRequest = NSFetchRequest()
+            let entityDescription = NSEntityDescription.entityForName("Pin", inManagedObjectContext: self.sharedContext)
+            fetchRequest.entity = entityDescription
+            let lat = (coordinates.latitude as Double).description
+            let lon = (coordinates.longitude as Double).description
+            let predicate = NSPredicate(format: "latitude == %@ && longitude == %@", lat,lon)
+            fetchRequest.predicate = predicate
+            
+            let pins: [Pin]
+            do {
+                let results = try self.sharedContext.executeFetchRequest(fetchRequest)
+                print (results)
+                pins = results as! [Pin]
+            }catch {
+                pins = [Pin]()
+            }
+            
+            var pin:Pin?
+            print("it has been here and pins count is \(pins.count)")
+            print("it can access pin's photo list \(pins[0].photos.count)")
+            if pins.count > 0 {
+                pin = pins[0]
+            }else{
+                let pinEntity =
+                NSEntityDescription.entityForName("Pin", inManagedObjectContext: self.sharedContext)
+                pin = Pin(entity: pinEntity!, insertIntoManagedObjectContext: self.sharedContext)
+                pin!.latitude = "\(coordinates.latitude)"
+                pin!.longitude = "\(coordinates.longitude)"
+                pin!.date = NSDate()
+            }
+
+            let photoEntity = NSEntityDescription.entityForName("Photo", inManagedObjectContext: self.sharedContext)
+            
+            for data in data {
+                let photo = Photo(entity: photoEntity!, insertIntoManagedObjectContext: self.sharedContext)
+                photo.url = data["url_m"] as! String
+                photo.id = data["id"] as! String
+                photo.pin = pin!
+                photo.saved = false
+//                photo.addObject(picture)
+                do {
+                    try self.sharedContext.save()
+                    self.backgroundImageDownload(photo.objectID)
+                } catch let error as NSError {
+                    print("Error Saving Child Context: \(error.localizedDescription)")
+                }
+            }
+            CoreDataStack.sharedInstance().saveContext()
+        }
+    }
+    
     
     func addAnnotation(coordinates: CLLocationCoordinate2D) {
         let annotation = MKPointAnnotation()
@@ -126,6 +186,42 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate,PhotoAlbu
         annotation.title = "Visited"
         mapView.addAnnotation(annotation)
     }
+    
+    func backgroundImageDownload(tempObjectId: NSManagedObjectID){
+        sharedContext.performBlock { () -> Void in
+            guard let photo = self.sharedContext.objectWithID(tempObjectId) as? Photo else{
+                return
+            }
+            let id = photo.id
+            let url = photo.url
+            let imageDownloadOperation = ImageDownloadOperation(url: url, id: id)
+            imageDownloadOperation.completionBlock = { () -> Void in
+                if photo.isExisted() {
+                    self.imageDownloadQueue.pendingOperations.removeValueForKey(id)
+                    
+                    self.sharedContext.performBlock(){ () -> Void in
+                        photo.saved = true
+                        do {
+                            try self.sharedContext.save()
+                            CoreDataStack.sharedInstance().saveContext()
+                        } catch let error as NSError{
+                            print(error.localizedDescription)
+                        }
+                    }
+                }else{
+                    self.sharedContext.performBlock({ () -> Void in
+                        photo.saved = false
+                        CoreDataStack.sharedInstance().saveContext()
+                    })
+                }
+                
+            }
+            self.imageDownloadQueue.pendingOperations[id] = imageDownloadOperation
+            self.imageDownloadQueue.downloadQueue.addOperation(imageDownloadOperation)
+        }
+
+    }
+    
     
     //MARK: - MKMapViewDelegate Methods
     

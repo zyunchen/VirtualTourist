@@ -7,3 +7,14 @@
 //
 
 import Foundation
+
+class ImageDownloadQueue {
+    
+    lazy var pendingOperations = [NSString:NSOperation]()
+    
+    lazy var downloadQueue:NSOperationQueue = {
+        var queue = NSOperationQueue()
+        queue.name = "ImageDownloadQueue"
+        return queue
+    }()
+}
