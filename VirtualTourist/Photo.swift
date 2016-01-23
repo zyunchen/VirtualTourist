@@ -13,10 +13,9 @@ import UIKit
 class Photo: NSManagedObject {
     
     @NSManaged var url: String
-    @NSManaged var text: String
     @NSManaged var id: String
     @NSManaged var pin: Pin
-    @NSManaged var saved: NSNumber
+    @NSManaged var saved: Bool
     
     //MARK: - Helper Methods
     
