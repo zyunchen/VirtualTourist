@@ -44,7 +44,6 @@ class PhotoAlbumViewController: UIViewController,NSFetchedResultsControllerDeleg
     @IBOutlet weak var newCollectionButton: UIButton!
     
     @IBAction func didPressNewCollection(sender: AnyObject) {
-        delegate?.performDownload(location!, page: "1")
         if let pictures = fetchedResultsController.fetchedObjects as? [Photo] {
             for picture in pictures{
                 context.deleteObject(picture)
@@ -168,13 +167,13 @@ extension PhotoAlbumViewController:UICollectionViewDataSource,UICollectionViewDe
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("CollectionCell", forIndexPath: indexPath) as! PhotoCollectionView
         let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         cell.imageView.image = photo.getImage()
+        cell.deleteLabel.hidden = true
         if photo.isExisted() {
             cell.activityIndicator.stopAnimating()
         }else{
             cell.activityIndicator.startAnimating()
             newCollectionButton.enabled = false
         }
-        cell.deleteLabel.hidden = true
         return cell
     }
     

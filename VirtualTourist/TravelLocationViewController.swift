@@ -195,8 +195,10 @@ class TravelLocationViewController: UIViewController,MKMapViewDelegate,PhotoAlbu
             let id = photo.id
             let url = photo.url
             let imageDownloadOperation = ImageDownloadOperation(url: url, id: id)
+            
+            let isExisted = photo.isExisted()
             imageDownloadOperation.completionBlock = { () -> Void in
-                if photo.isExisted() {
+                if isExisted {
                     self.imageDownloadQueue.pendingOperations.removeValueForKey(id)
                     
                     self.sharedContext.performBlock(){ () -> Void in
